@@ -1,5 +1,5 @@
 import { ENV_DEV, ENV_PROD } from "../constants";
-import canHandleModel from "./handlers/model";
+import canHandleModel from "./handlers/canHandleModel";
 
 const Config = (laststate = {}) => {
   let model = {
