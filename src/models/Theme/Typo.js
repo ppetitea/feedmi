@@ -1,10 +1,11 @@
 import canHandleModel from "../handlers/canHandleModel";
 import palette from "../../constants/colors/palette";
+import styles from "../../constants/theme";
 
-const Typography = (lastState = {}) => {
+const Typo = (lastState = {}) => {
   let model = { state: {} };
   const behavior = (model) => ({
-    ...canHandleTypography(model),
+    ...canHandleTypo(model),
     init: (lastState = {}) => {
       model.flex(1).center().centerV().nowrap().nooverflow();
       model.color(palette.text.primary);
@@ -16,19 +17,39 @@ const Typography = (lastState = {}) => {
   return model;
 };
 
-const canHandleTypography = (model) => ({
+const canHandleTypo = (model) => ({
   ...canHandleModel(model),
-  ...canHandleTypographyAlignement(model),
-  ...canHandleTypographyVariant(model),
+  ...canHandleTypoAlignement(model),
+  ...canHandleTypoVariant(model),
+  exist: (key) => key !== undefined && model[key] !== undefined,
+  fromProps: (props) => {
+    for (const [key, value] of Object.entries(props)) {
+      if (model.exist(key)) model[key](value);
+    }
+    model.classesFromProps(props);
+    return model;
+  },
+  classesFromProps: (props) => {
+    let classes = "";
+    for (const [key, value] of Object.entries(props)) {
+      if (styles[key]) {
+        if (Array.isArray(styles[key])) classes += styles[key][value];
+        else classes += styles[key];
+      }
+    }
+    model.set("classes", classes);
+    return model;
+  },
+  toProps: () => ({ style: model.state, classes: model.classes }),
 });
 
-const canHandleTypographyAlignement = (model) => ({
+const canHandleTypoAlignement = (model) => ({
   flex: (v) => model.set("flex", v),
   nowrap: (v) => model.set("flexWrap", "nowrap"),
   nooverflow: () => model.set("overflow", "hidden"),
-  top: () => model.set("textAlignVertical", "top"),
-  centerV: () => model.set("textAlignVertical", "center"),
-  bottom: () => model.set("textAlignVertical", "bottom"),
+  top: () => model.set("verticalAlign", "top"),
+  centerV: () => model.set("verticalAlign", "middle"),
+  bottom: () => model.set("verticalAlign", "bottom"),
   left: () => model.set("textAlign", "left"),
   center: () => model.set("textAlign", "center"),
   right: () => model.set("textAlign", "right"),
@@ -50,10 +71,10 @@ const canHandleTypographyAlignement = (model) => ({
   italic: () => model.set("fontStyle", "italic"),
 });
 
-const canHandleTypographyVariant = (model) => ({
+const canHandleTypoVariant = (model) => ({
   h1: () => model.size(96).weight(100).spacing(-1.5),
   h2: () => model.size(60).weight(100).spacing(-0.5),
-  h3: () => model.size(48).weight("normal").spacing(0),
+  h3: () => model.size(48).weight(300).spacing(0),
   h4: () => model.size(34).weight("normal").spacing(0.25),
   h5: () => model.size(24).weight("normal").spacing(0),
   h6: () => model.size(20).weight("bold").spacing(0.15),
@@ -82,4 +103,4 @@ const canHandleTypographyVariant = (model) => ({
   },
 });
 
-export default Typography;
+export default Typo;

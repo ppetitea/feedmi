@@ -1,0 +1,14 @@
+{
+  "extends": ["react-app"],
+  "rules": {},
+  "overrides": [
+    {
+      "files": ["**/*.js?(x)"],
+      "rules": {
+        "no-unused-vars": "off",
+        "no-empty-pattern": "off",
+        "react-hooks/exhaustive-deps": "off"
+      }
+    }
+  ]
+}

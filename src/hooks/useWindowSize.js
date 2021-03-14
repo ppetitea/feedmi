@@ -18,10 +18,15 @@ const useWindowSize = () => {
   }, []);
 
   const { width, height } = size;
+  const min = width < height ? width : height;
+  const max = width > height ? width : height;
+
   const vw = (k) => width * k;
   const vh = (k) => height * k;
+  const vmin = (k) => min * k;
+  const vmax = (k) => max * k;
 
-  return { width, height, vh, vw };
+  return { width, height, vh, vw, vmin, vmax };
 };
 
 export default useWindowSize;

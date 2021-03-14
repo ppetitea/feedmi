@@ -1,73 +1,130 @@
-const palette = {
+import canHandleModel from "../../models/handlers/canHandleModel";
+
+const HSL = (lastState = {}) => {
+  let model = {
+    state: {
+      h: 0,
+      s: 0,
+      l: 0,
+      a: null,
+      ...lastState,
+    },
+  };
+  const behavior = (model) => ({
+    string: () => {
+      const { h, s, l, a } = model.state;
+      if (a !== null) {
+        return `hsla(${h},${s}%,${l}%,${a})`;
+      } else return `hsl(${h},${s}%,${l}%)`;
+    },
+    luminosity: (n) => {
+      const { l } = model.state;
+      let next = parseInt(l) + parseInt(n);
+      if (next < 0) next = 0;
+      if (next > 100) next = 100;
+      model.state.l = next;
+      return model;
+    },
+    darker: (n = 11) => model.luminosity(-n),
+    lighter: (n = 14) => model.luminosity(n),
+    parse: (s) => {
+      const reg = /hsla?\(\s*(\d+)\s*,\s*(\d+(?:\.\d+)?)%\s*,\s*(\d+(?:\.\d+)?)%(?:,\s*(\d+(?:\.\d+)?))?\)/g;
+      let color = reg.exec(s).slice(1);
+      color = color.filter((i) => i !== undefined);
+      model.state.h = color[0];
+      model.state.s = color[1];
+      model.state.l = color[2];
+      if (color.length > 3) model.state.a = color[color.length - 1];
+      return model;
+    },
+  });
+  Object.assign(model, behavior(model));
+  return model;
+};
+
+const hslPalette = {
   primary: {
-    main: "rgb(33,150,243)",
-    dark: "rgb(11, 121, 208)",
-    light: "rgb(100, 182, 247)",
-    text: "#FFFFFF",
-    background: "rgba(33,150,243,0.08)",
-    border: "rgba(33,150,243,0.5)",
+    main: { h: 207, s: 90, l: 54 },
+    dark: { h: 207, s: 90, l: 43 },
+    light: { h: 207, s: 90, l: 68 },
+    text: { h: 0, s: 0, l: 100 },
+    background: { h: 207, s: 90, l: 54, a: 0.08 },
+    border: { h: 207, s: 90, l: 54, a: 0.5 },
   },
   secondary: {
-    main: "rgb(233,30,99)",
-    dark: "rgb(190,19,77)",
-    light: "rgb(240,97,145)",
-    text: "#FFFFFF",
-    background: "rgba(233,30,99,0.08)",
-    border: "rgba(233,30,99,0.5)",
+    main: { h: 340, s: 82, l: 52 },
+    dark: { h: 340, s: 82, l: 41 },
+    light: { h: 340, s: 82, l: 66 },
+    text: { h: 0, s: 0, l: 100 },
+    background: { h: 340, s: 82, l: 52, a: 0.08 },
+    border: { h: 340, s: 82, l: 52, a: 0.5 },
   },
   text: {
-    primary: "rgba(0,0,0,0.87)",
-    secondary: "rgba(0,0,0,0.54)",
-    disabled: "rgba(0,0,0,0.38)",
-    hint: "rgba(0,0,0,0.38)",
+    primary: { h: 0, s: 0, l: 0, a: 0.87 },
+    secondary: { h: 0, s: 0, l: 0, a: 0.54 },
+    disabled: { h: 0, s: 0, l: 0, a: 0.38 },
+    hint: { h: 0, s: 0, l: 0, a: 0.38 },
   },
   action: {
-    main: "rgb(224,224,224)",
-    hover: "rgba(0,0,0,0.04)",
-    selected: "rgba(0,0,0,0.08)",
-    disabledBg: "rgba(0,0,0,0.12)",
-    disabled: "rgba(0,0,0,0.26)",
-    focus: "rgba(0,0,0,0.12)",
+    main: { h: 0, s: 0, l: 88 },
+    hover: { h: 0, s: 0, l: 0, a: 0.04 },
+    selected: { h: 0, s: 0, l: 0, a: 0.08 },
+    disabledBg: { h: 0, s: 0, l: 0, a: 0.12 },
+    disabled: { h: 0, s: 0, l: 0, a: 0.26 },
+    focus: { h: 0, s: 0, l: 0, a: 0.12 },
   },
   other: {
-    border: "rgba(0,0,0,0.23)",
-    white: "rgb(255,255,255)",
-    divider: "rgba(0,0,0,0.12)",
+    border: { h: 0, s: 0, l: 0, a: 0.23 },
+    white: { h: 0, s: 0, l: 100 },
+    divider: { h: 0, s: 0, l: 0, a: 0.12 },
+    shadow: { h: 0, s: 0, l: 0, a: 0.25 },
   },
   info: {
-    main: "rgb(33,150,243)",
-    dark: "rgb(11,121,208)",
-    light: "rgb(100,182,247)",
-    text: "rgb(255,255,255)",
-    textDark: "rgb(13,60,97)",
-    lightBg: "rgb(232,244,254)",
+    main: { h: 207, s: 90, l: 54 },
+    dark: { h: 207, s: 90, l: 43 },
+    light: { h: 207, s: 90, l: 68 },
+    text: { h: 0, s: 0, l: 100 },
+    textDark: { h: 207, s: 76, l: 22 },
+    lightBg: { h: 207, s: 92, l: 95 },
   },
   success: {
-    main: "rgb(76,175,80)",
-    dark: "rgb(59,135,62)",
-    light: "rgb(123,198,126)",
-    text: "rgb(255,255,255)",
-    textDark: "rgb(30,70,32)",
-    lightBg: "rgb(237,247,237)",
+    main: { h: 122, s: 39, l: 49 },
+    dark: { h: 122, s: 39, l: 38 },
+    light: { h: 122, s: 39, l: 63 },
+    text: { h: 0, s: 0, l: 100 },
+    textDark: { h: 122, s: 39, l: 20 },
+    lightBg: { h: 122, s: 39, l: 95 },
   },
   error: {
-    main: "rgb(244,67,54)",
-    dark: "rgb(227,27,12)",
-    light: "rgb(248,128,120)",
-    text: "rgb(255,255,255)",
-    textDark: "rgb(98,27,22)",
-    lightBg: "rgb(254,236,234)",
+    main: { h: 4, s: 90, l: 58 },
+    dark: { h: 4, s: 90, l: 47 },
+    light: { h: 4, s: 90, l: 72 },
+    text: { h: 0, s: 0, l: 100 },
+    textDark: { h: 4, s: 90, l: 20 },
+    lightBg: { h: 4, s: 90, l: 95 },
   },
   warning: {
-    main: "rgb(255,152,0)",
-    dark: "rgb(119,119,0)",
-    light: "rgb(255,181,71)",
-    text: "rgb(33,20,0)",
-    textDark: "rgb(102,61,0)",
-    lightBg: "rgb(255,244,229)",
+    main: { h: 36, s: 100, l: 50 },
+    dark: { h: 36, s: 100, l: 39 },
+    light: { h: 36, s: 100, l: 64 },
+    text: { h: 0, s: 0, l: 100 },
+    textDark: { h: 36, s: 100, l: 20 },
+    lightBg: { h: 36, s: 100, l: 95 },
   },
 };
 
+const palette = Object.fromEntries(
+  Object.entries(hslPalette).map(([key, value]) => {
+    const nextValue = Object.fromEntries(
+      Object.entries(value).map(([key, value]) => {
+        return [key, HSL(value).string()];
+      })
+    );
+    return [key, nextValue];
+  })
+);
+
+export { HSL };
 export const primary = palette.primary.main;
 export const secondary = palette.secondary.main;
 export const text = palette.text.primary;

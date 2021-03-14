@@ -1,21 +1,32 @@
 import React from "react";
 import { BrowserRouter, HashRouter, Switch, Route } from "react-router-dom";
-import DevelopPage from "../screens/Develop/Develop";
+import OfflineNavigation from "./OfflineNavigation";
+import SecureNavigation from "./SecureNavigation";
 import { config } from "../services";
+import { connect } from "react-redux";
+import App from "../models/App";
+import Auth from "../models/Auth";
 
-export default function AppNavigation() {
+const AppNavigation = ({ app, auth }) => {
   const Router = config.isProdEnv() ? HashRouter : BrowserRouter;
   const basename = config.isProdEnv() ? "/feedmi/" : "/";
 
+  const canAccessToSecure = app.get("canAccessSecureNav");
+
   return (
     <Router basename={basename}>
-      {/* A <Switch> looks through its children <Route>s and
-            renders the first one that matches the current URL. */}
       <Switch>
-        <Route exact path="/">
-          <DevelopPage />
+        <Route path="*">
+          {canAccessToSecure ? <SecureNavigation /> : <OfflineNavigation />}
         </Route>
       </Switch>
     </Router>
   );
-}
+};
+
+const MapStateToProps = (state) => ({
+  app: App(state.app),
+  auth: Auth(state.auth),
+});
+
+export default connect(MapStateToProps)(AppNavigation);

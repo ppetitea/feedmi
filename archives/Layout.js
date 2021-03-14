@@ -1,59 +1,24 @@
-import React, { useState, useRef } from "react";
-import { isMobile } from "react-device-detect";
-import { Container } from "@material-ui/core";
-import Layout from "../models/Theme/Layout";
-import TouchableModel from "../models/Theme/Touchable";
+import { ButtonBase, Container } from "@material-ui/core";
+import React from "react";
+import LayoutModel from "../models/Theme/Layout";
 import styles from "../constants/theme";
 
-const useTouchable = ({}) => {
-  const [state, setState] = useState(TouchableModel());
-  const ref = useRef(null);
+const Layout = (props) => {
+  const { children, forwardedProps = {} } = props;
 
-  const onPress = () => {};
-  const onLongPress = () => {};
-  const onRelease = () => {};
-  const onHoverStart = () => {};
-  const onHoverEnd = () => {};
-  const onDragStart = () => {};
-  const onDrag = () => {};
-  const onDrop = () => {};
-
-  return { state, ref };
-};
-
-const Touchable = (props) => {
-  const {
-    children,
-    onPress = () => {},
-    onLongPress = () => {},
-    onRelease = () => {},
-    onHoverStart = () => {},
-    onHoverEnd = () => {},
-    onDragStart = () => {},
-    onDrag = () => {},
-    onDrop = () => {},
-  } = props;
-
+  const LayoutContainer = buildLayoutContainer(props);
   try {
     const style = buildStyle(props);
     const classes = buildClasses(props);
+
     return (
-      <Container
-        onMouseEnter={onMouseEnter}
-        onMouseOver={onMouseOver}
-        onMouseDown={onMouseDown}
-        onMouseUp={onMouseUp}
-        onMouseLeave={onMouseLeave}
-        onClick={onClick}
-        onTouchStart={onTouchStart}
-        onTouchEnd={onTouchEnd}
-        onTouchCancel={onTouchCancel}
-        onTouchMove={onTouchMove}
+      <LayoutContainer
         style={style.state}
         className={classes}
+        {...forwardedProps}
       >
         {children}
-      </Container>
+      </LayoutContainer>
     );
   } catch (e) {
     console.log(e);
@@ -61,40 +26,15 @@ const Touchable = (props) => {
   }
 };
 
-const onMouseEnter = () => {
-  console.log("enter");
+const buildLayoutContainer = ({ variant, Component }) => {
+  let layout = (props) => <div {...props}>{props.children}</div>;
+  if (variant === "button") {
+    layout = (props) => <button {...props}>{props.children}</button>;
+  } else if (variant === "form") {
+    layout = (props) => <form {...props}>{props.children}</form>;
+  }
+  return layout;
 };
-const onMouseOver = () => {
-  console.log("over");
-};
-const onMouseDown = () => {
-  console.log("down");
-};
-const onMouseUp = () => {
-  console.log("up");
-};
-const onMouseLeave = () => {
-  console.log("leave");
-};
-const onClick = () => {
-  console.log("click");
-};
-const onTouchStart = () => {
-  console.log("touched");
-};
-const onTouchEnd = () => {
-  console.log("released");
-};
-const onTouchLeave = () => {
-  console.log("Leave");
-};
-const onTouchCancel = () => {
-  console.log("Cancel");
-};
-const onTouchMove = () => {
-  console.log("Move");
-};
-
 const buildStyle = ({
   flex,
   row,
@@ -131,7 +71,7 @@ const buildStyle = ({
   bdColor,
   elevation,
 }) => {
-  let layout = Layout();
+  let layout = LayoutModel();
 
   if (flex) layout.flex(flex);
   if (row) layout.row().itemsCenter();
@@ -174,9 +114,8 @@ const buildClasses = ({ elevation, variant }) => {
   let classes = styles.baseline;
 
   if (elevation) classes += styles.elevations[elevation];
-  if (variant === "pressable") classes += styles.pressable;
 
   return classes;
 };
 
-export default Touchable;
+export default Layout;

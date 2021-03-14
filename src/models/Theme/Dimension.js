@@ -29,6 +29,8 @@ const canHandleDimensions = (model) => ({
   whratio: () => model.get("whratio"),
   min: () => model.get("min"),
   max: () => model.get("max"),
+  vmin: (k) => model.min() * k,
+  vmax: (k) => model.max() * k,
   vw: (k) => model.get("width") * k,
   vh: (k) => model.get("height") * k,
 });

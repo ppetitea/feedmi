@@ -1,4 +1,9 @@
+import palette, { HSL } from "../../constants/colors/palette";
+import { dimensions } from "../../services";
 import canHandleModel from "../handlers/canHandleModel";
+import styles from "../../constants/theme";
+
+const { vw, vh, vmin } = dimensions;
 
 const Layout = (lastState = {}) => {
   let model = { state: {} };
@@ -13,6 +18,8 @@ const Layout = (lastState = {}) => {
       model.selfStretch();
       model.margin(5);
       model.padding(5);
+      model.wmax("none");
+      model.width("auto");
       Object.assign(model.state, lastState);
     },
   });
@@ -26,13 +33,42 @@ const canHandleLayout = (model) => ({
   ...canHandleLayoutDirection(model),
   ...canHandleLayoutSize(model),
   ...canHandleLayoutBorder(model),
-  ...canHandleLayoutBackground(model),
-  ...canHandleLayoutMode(model),
+  ...canHandleLayoutColor(model),
+  ...canHandleLayoutShadow(model),
+  ...canHandleLayoutType(model),
+  ...canHandleLayoutWrap(model),
+  add: (key, value) => {
+    const v = model.get(key);
+    const n = v ? parseFloat(v) + value : value;
+    model.set(key, n);
+    return model;
+  },
+  exist: (key) => key !== undefined && model[key] !== undefined,
+  fromProps: (props) => {
+    for (const [key, value] of Object.entries(props)) {
+      if (model.exist(key)) model[key](value);
+    }
+    model.classesFromProps(props);
+    return model;
+  },
+  classesFromProps: (props) => {
+    let classes = "";
+    for (const [key, value] of Object.entries(props)) {
+      if (styles[key]) {
+        if (Array.isArray(styles[key])) classes += styles[key][value];
+        else classes += styles[key];
+      }
+    }
+    model.set("classes", classes);
+    return model;
+  },
+  toProps: () => ({ style: model.state, classes: model.classes }),
 });
 
 const canHandleLayoutDirection = (model) => ({
-  col: () => model.set("flexDirection", "column"),
-  row: () => model.set("flexDirection", "row"),
+  direction: (v) => model.set("flexDirection", v),
+  col: () => model.direction("column"),
+  row: () => model.direction("row").itemsCenter(),
   itemsStart: () => model.set("justifyContent", "flex-start"),
   itemsCenter: () => model.set("justifyContent", "center"),
   itemsEnd: () => model.set("justifyContent", "flex-end"),
@@ -41,7 +77,6 @@ const canHandleLayoutDirection = (model) => ({
   alignEnd: () => model.set("alignItems", "flex-end"),
   selfStretch: () => model.set("alignSelf", "stretch"),
   selfCenter: () => model.set("alignSelf", "center"),
-  nowrap: (v) => model.set("flexWrap", "nowrap"),
   nooverflow: () => model.set("overflow", "hidden"),
   items: (v) => {
     if (v === "start") return model.itemsStart();
@@ -67,6 +102,15 @@ const canHandleLayoutSize = (model) => ({
   wmax: (v) => model.set("maxWidth", v),
   hmin: (v) => model.set("minHeight", v),
   wmin: (v) => model.set("minWidth", v),
+  wmix: (v) => model.wmin(v).wmax(v),
+  hmix: (v) => model.hmin(v).hmax(v),
+});
+
+const canHandleLayoutWrap = (model) => ({
+  wrap: () => model.set("flexWrap", "wrap"),
+  wrapR: () => model.set("flexWrap", "wrapReverse"),
+  nowrap: () => model.set("flexWrap", "nowrap"),
+  gap: (v) => model.set("gap", v),
 });
 
 const canHandleLayoutBorder = (model) => ({
@@ -79,26 +123,34 @@ const canHandleLayoutBorder = (model) => ({
   marginB: (v) => model.set("marginBottom", v),
   marginL: (v) => model.set("marginLeft", v),
   marginR: (v) => model.set("marginRight", v),
-  paddingV: (v) => model.set("paddingVertical", v),
-  paddingH: (v) => model.set("paddingHorizontal", v),
+  paddingV: (v) => model.paddingT(v).paddingB(v),
+  paddingH: (v) => model.paddingL(v).paddingR(v),
   paddingT: (v) => model.set("paddingTop", v),
   paddingB: (v) => model.set("paddingBottom", v),
   paddingL: (v) => model.set("paddingLeft", v),
   paddingR: (v) => model.set("paddingRight", v),
   bdWidth: (v) => model.set("borderWidth", v),
   bdColor: (v) => model.set("borderColor", v),
+  bdStyle: (v) => model.set("borderStyle", v),
   radius: (v) => model.set("borderRadius", v),
-  elevation: (v) => model.set("elevation", v),
 });
 
-const canHandleLayoutBackground = (model) => ({
+const canHandleLayoutColor = (model) => ({
   bgColor: (v) => model.set("backgroundColor", v),
 });
 
-const canHandleLayoutMode = (model) => ({
+const canHandleLayoutShadow = (model) => ({
+  shadow: (v) => model.set("boxShadow", v),
+});
+
+const canHandleLayoutType = (model) => ({
   rounded: () => model.radius(20),
-  outlined: (c) => model.rounded().bdWidth(1).bdColor(c),
-  contained: (c) => model.rounded().elevation(1).bgColor(c),
+  outlined: (c) => {
+    model.rounded().bdWidth(1).bdColor(c).bdStyle("solid");
+    return model.bgColor(palette.other.white);
+  },
+  contained: (c) => model.rounded().bgColor(c),
+  page: () => model.margin(0).width(vw(1)).height(vh(1)),
 });
 
 export default Layout;

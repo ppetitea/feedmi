@@ -4,8 +4,9 @@ const Touchable = (laststate = {}) => {
   let model = {
     lastState: null,
     state: {
-      pressed: false,
       hover: false,
+      down: false,
+      touched: false,
       dragged: false,
       dropped: false,
       posX: 0,
@@ -25,29 +26,15 @@ const Touchable = (laststate = {}) => {
 };
 
 export const canHandleTouchable = (model) => ({
-  setPressed: (v) => model.set("pressed", v),
-  setHover: (v) => model.set("hover", v),
-  setDragged: (v) => model.set("dragged", v),
-  setDropped: (v) => model.set("dropped", v),
-  handleHoverStart: () => {
-    model.setHover(true);
-  },
-  handleHoverStop: () => {
-    model.setHover(false);
-  },
-  handlePress: () => {
-    model.setPressed(true);
-  },
-  handleReleased: () => {
-    model.setPressed(false);
-  },
-  handleDrag: () => {
-    model.setDragged(true);
-  },
-  handleDrag: () => {
-    model.setDragged(false);
-    model.setDropped(true);
-  },
+  onMouseEnter: () => model.set("hover", true),
+  onMouseOver: () => model.set("hover", false),
+  onMouseLeave: () => model.set("hover", false),
+  onMouseDown: () => model.set("down", true),
+  onMouseUp: () => model.set("down", false).set("touched", false),
+  onClick: () => model.set("down", false).set("touched", false),
+  onTouchStart: () => model.set("touched", true),
+  onTouchEnd: () => model.set("touched", false),
+  onTouchCancel: () => model.set("touched", false),
 });
 
 export default Touchable;
