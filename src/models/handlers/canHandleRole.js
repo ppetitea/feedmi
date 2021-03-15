@@ -9,7 +9,7 @@ const norole = () => {
   return Object.assign(model, behavior(model));
 };
 
-export const canHandleRole = (model) => ({
+export const canHandleRole = (model, app) => ({
   as: (role) => {
     let found = model.get(role);
     if (found?.do) return found;
@@ -24,13 +24,13 @@ export const canHandleRole = (model) => ({
     return actions.find(callback) !== undefined ? true : false;
   },
   do: (action) => {
-    console.log(action);
+    const logger = app.get("logger");
     if (model.can(action) && model[action] !== undefined) {
+      if (logger) logger.trace(action);
       return model[action];
     }
-    const error = `l'action '${action}' n'est pas disponible`;
     return () => {
-      console.log(error);
+      if (logger) logger.warn(`l'action '${action}' n'est pas disponible`);
       return model;
     };
   },

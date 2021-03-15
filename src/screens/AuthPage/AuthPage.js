@@ -10,54 +10,39 @@ import { dimensions } from "../../services";
 import { connect } from "react-redux";
 import Typo from "../../fragments/Typo";
 import palette from "../../constants/colors/palette";
+import { grey } from "../../constants/colors/colors";
 import Button from "../../components/Button";
 import TextField from "./components/TextField";
 import Carousel from "react-elastic-carousel";
-import App from "../../system/app";
+import App from "../../system/App";
 
 const app = App().do("init")();
 
 const { vh, vw, vmin } = dimensions;
 
 const AuthPage = (props) => {
-  const {
-    headerHandlePress,
-    storeHandlePress,
-    listsHandlePress,
-    shoppingHandlePress,
-  } = useLogic();
-  const items = [
-    { id: 1, title: "item #1" },
-    { id: 2, title: "item #2" },
-    { id: 3, title: "item #3" },
-    { id: 4, title: "item #4" },
-    { id: 5, title: "item #5" },
-  ];
-
   let user = {
     email: "pierre.petiteau.4985@gmail.com",
     password: "pp169518185",
   };
+
   useEffect(() => {
     const fn = async () => {
-      console.log("start");
-      await app.as("auth").do("createUser")(user.email, user.password);
       await app.as("auth").do("login")(user.email, user.password);
       await app.as("auth").do("logout")();
-      console.log("stop");
     };
     fn();
   }, []);
 
   return (
-    <Layout page={true} row={true}>
-      <Layout noborder={true} wmax={vmin(1)}>
-        {/* <Layout row={true} hmix={vh(0.2)}>
+    <Layout page={true} row={true} bgColor={grey[900]}>
+      {/* <Layout noborder={true} wmax={vmin(1)}>
+        <Layout row={true} hmix={vh(0.2)}>
           <Typo h3={true} color={palette.text.secondary} textShadow={true}>
             Connexion
           </Typo>
-        </Layout> */}
-        {/* <form>
+        </Layout>
+        <form>
           <Layout items="center" hmin={vh(0.5)} wmin={vw(1)}>
             <Carousel itemsToShow={1}>
               <TextField name="mail" label="Email" inputProps={{}} />
@@ -70,7 +55,7 @@ const AuthPage = (props) => {
               />
             </Carousel>
           </Layout>
-        </form> */}
+        </form>
         <Layout hmix={vh(0.2)} items="end">
           <Layout
             variant="button"
@@ -86,7 +71,7 @@ const AuthPage = (props) => {
             </Typo>
           </Layout>
         </Layout>
-      </Layout>
+      </Layout> */}
     </Layout>
   );
 };

@@ -1,7 +1,7 @@
-import App from "../../models/App";
+import App from "../../system/App";
 import { APP_SET } from "../constants";
 
-const appReducer = (state = App().state, action) => {
+const appReducer = (state = App().do("init").state, action) => {
   switch (action.type) {
     case APP_SET: {
       const nextState = { ...action.payload };

@@ -26,7 +26,7 @@ const Firebase = (init = {}, app) => {
 
   const behavior = (model, app) => ({
     ...canHandleModel(model),
-    ...canHandleRole(model),
+    ...canHandleRole(model, app),
     ...canHandleFirebase(model, app),
   });
   Object.assign(model, behavior(model, app));
@@ -64,11 +64,12 @@ const canHandleFirebaseActions = (model, app) => ({
     const payload = { req };
     const callbacks = {
       onSuccess: async (res) => {
+        app.get("logger").info("createUser with success");
         model.set("email", email).set("password", password);
-        console.log("createUser success", res);
       },
       onFailure: (err) => {
-        console.log("createUser error", err);
+        app.get("logger").error("fail to createUser");
+        app.get("logger").error(err);
       },
     };
     await model.request(payload, callbacks);
@@ -81,12 +82,13 @@ const canHandleFirebaseActions = (model, app) => ({
     const payload = { req };
     const callbacks = {
       onSuccess: (res) => {
-        console.log("login success", res);
+        app.get("logger").info("login with success");
         model.set("email", email).set("password", password);
         model.set("actions", ["logout"]);
       },
       onFailure: (err) => {
-        console.log("login error", err);
+        app.get("logger").error("fail to login");
+        app.get("logger").error(err);
       },
     };
     await model.request(payload, callbacks);
@@ -97,14 +99,15 @@ const canHandleFirebaseActions = (model, app) => ({
     const payload = { req };
     const callbacks = {
       onSuccess: (res) => {
-        console.log("logout success");
+        app.get("logger").info("logout with success");
         model.set("logged", false);
         model.set("password", null);
         model.set("actions", ["createUser", "login"]);
         // app.as("nav").do("offline")();
       },
       onFailure: (err) => {
-        console.log("logout error", err);
+        app.get("logger").error("fail to logout");
+        app.get("logger").error(err);
       },
     };
     await model.request(payload, callbacks);

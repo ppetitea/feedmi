@@ -11,7 +11,7 @@ const Nav = (init = {}, app) => {
 
   const behavior = (model, app) => ({
     ...canHandleModel(model),
-    ...canHandleRole(model),
+    ...canHandleRole(model, app),
     ...canHandleNav(model, app),
   });
   Object.assign(model, behavior(model, app));
