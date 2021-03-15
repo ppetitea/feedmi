@@ -12,7 +12,7 @@ const Log = (init = {}) => {
   let model = {
     state: {
       level: TRACE, // TRACE | DEBUG | INFO | WARN | ERROR
-      date: moment().format("DD/MM/YY hh:mm:ss "),
+      date: moment().format("YY/MM/DD hh:mm:ss "),
       message: "",
       ...init,
     },

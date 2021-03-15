@@ -1,4 +1,5 @@
 import canHandleModel from "../models/handlers/canHandleModel";
+import { CONFIG_SET } from "../redux/constants";
 import { TRACE, DEBUG, INFO, WARN, ERROR, NOLOG } from "./Log";
 
 export const Config = (init = {}, app) => {
@@ -18,4 +19,8 @@ export const Config = (init = {}, app) => {
   return model;
 };
 
-const canHandleConfig = (model, app) => ({});
+const canHandleConfig = (model, app) => ({
+  ...canHandleConfigPersist(model, app),
+});
+
+const canHandleConfigPersist = (model, app) => ({});

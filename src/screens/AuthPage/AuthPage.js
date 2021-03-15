@@ -16,7 +16,8 @@ import TextField from "./components/TextField";
 import Carousel from "react-elastic-carousel";
 import App from "../../system/App";
 
-const app = App().do("init")();
+let app = App().do("init")();
+let render = 0;
 
 const { vh, vw, vmin } = dimensions;
 
@@ -25,6 +26,10 @@ const AuthPage = (props) => {
     email: "pierre.petiteau.4985@gmail.com",
     password: "pp169518185",
   };
+  console.log("render ", render);
+  render++;
+
+  let logLevel = app.get("config")?.get("logLevel");
 
   useEffect(() => {
     const fn = async () => {
@@ -32,10 +37,29 @@ const AuthPage = (props) => {
       await app.as("auth").do("logout")();
     };
     fn();
-  }, []);
+  }, [logLevel]);
 
   return (
     <Layout page={true} row={true} bgColor={grey[900]}>
+      <Layout hmix={vh(0.2)} items="end">
+        <Layout
+          variant="button"
+          onPress={() => {
+            console.log(logLevel);
+            app.get("config")?.set("logLevel", logLevel + 1);
+            console.log(app.get("config")?.get("logLevel"));
+          }}
+          forwardedProps={{ type: "submit" }}
+          marginT="auto"
+          row={true}
+          contained={palette.action.main}
+          hmix={vh(0.08)}
+        >
+          <Typo h6={true} color={palette.text.secondary}>
+            Suivant
+          </Typo>
+        </Layout>
+      </Layout>
       {/* <Layout noborder={true} wmax={vmin(1)}>
         <Layout row={true} hmix={vh(0.2)}>
           <Typo h3={true} color={palette.text.secondary} textShadow={true}>
@@ -56,21 +80,6 @@ const AuthPage = (props) => {
             </Carousel>
           </Layout>
         </form>
-        <Layout hmix={vh(0.2)} items="end">
-          <Layout
-            variant="button"
-            onPress={() => {}}
-            forwardedProps={{ type: "submit" }}
-            marginT="auto"
-            row={true}
-            contained={palette.action.main}
-            hmix={vh(0.08)}
-          >
-            <Typo h6={true} color={palette.text.secondary}>
-              Suivant
-            </Typo>
-          </Layout>
-        </Layout>
       </Layout> */}
     </Layout>
   );
